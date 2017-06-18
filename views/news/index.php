@@ -14,9 +14,9 @@ use yii\widgets\Menu;
             'id' => 'limitMenu',
         ],
         'items' => [
-            ['label' => '10,', 'url' => ['index', 'limit' => 10], 'active' => $limit == 10],
-            ['label' => '20,', 'url' => ['index', 'limit' => 20], 'active' => $limit == 20],
-            ['label' => '50', 'url' => ['index', 'limit' => 50], 'active' => $limit == 50],
+            ['label' => '10,', 'url' => ['index', 'per-page' => 10, 'page' => $pages->page], 'active' => $pages->limit == 10],
+            ['label' => '20,', 'url' => ['index', 'per-page' => 20, 'page' => $pages->page], 'active' => $pages->limit == 20],
+            ['label' => '50', 'url' => ['index', 'per-page' => 50, 'page' => $pages->page], 'active' => $pages->limit == 50],
         ]
     ]) ?> .
 </div>

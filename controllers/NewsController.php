@@ -7,13 +7,12 @@ use yii\data\Pagination;
 
 class NewsController extends \yii\web\Controller
 {
-    public function actionIndex($limit = 10)
+    public function actionIndex()
     {
         $query = News::find()->where(['status' => 1]);
         $countQuery = clone $query;
         $pages = new Pagination([
             'totalCount' => $countQuery->count(),
-            'pageSize' => $limit,
         ]);
         $models = $query->offset($pages->offset)
             ->limit($pages->limit)
@@ -22,7 +21,6 @@ class NewsController extends \yii\web\Controller
         return $this->render('index', [
             'models' => $models,
             'pages' => $pages,
-            'limit' => $limit,
         ]);
     }
 
