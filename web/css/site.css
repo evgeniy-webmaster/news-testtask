@@ -113,3 +113,17 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+#limitMenu {
+    display: inline;
+    padding: 0;
+}
+
+#limitMenu li {
+    list-style: none;
+    display: inline;
+}
+
+#limitMenu li.active a {
+    color: #333;
+}
