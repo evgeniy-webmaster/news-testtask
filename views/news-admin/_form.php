@@ -14,6 +14,15 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
+    <?php if($model->imageSrc): ?>
+        <?= Html::img($model->imageSrc, [
+            'width' => '300px',
+            'alt' => 'Upload image, please.',
+        ]) ?>
+    <?php endif; ?>
+
+    <?= $form->field($model, 'image')->fileInput() ?>
+
     <?= $form->field($model, 'shortText')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'text')->textarea(['rows' => 6]) ?>

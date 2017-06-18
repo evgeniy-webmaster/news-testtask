@@ -18,7 +18,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class News extends \yii\db\ActiveRecord
 {
-    
+    public $image;
+
     function init()
     {
         $this->status = true;
@@ -48,12 +49,27 @@ class News extends \yii\db\ActiveRecord
             [['title', 'shortText', 'text', 'status'], 'required'],
             [['authorId'], 'default', 'value' => Yii::$app->user->identity->id],
             [['authorId'], 'integer'],
-            [['status'], 'boolean'],
-            [['text'], 'string'],
+            [['authorId'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['authorId' => 'id']],
             [['title'], 'string', 'max' => 150],
             [['shortText'], 'string', 'max' => 500],
-            [['authorId'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['authorId' => 'id']],
+            [['image'], 'file', 'skipOnEmpty' => false, 'skipOnEmpty' => true, 'extensions' => 'jpg'],
+            [['text'], 'string'],
+            [['status'], 'boolean'],
         ];
+    }
+
+    public function getImageSrc()
+    {
+        if(file_exists(Yii::getAlias('@app') . '/web/news-images/' . $this->id . '.jpg'))
+            return '/news-images/' . $this->id . '.jpg';
+        else false;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if($this->image instanceof \yii\web\UploadedFile)
+            $this->image->saveAs(Yii::getAlias('@app') . '/web/news-images/' . $this->id . '.jpg');
+        parent::afterSave($insert, $changedAttributes);
     }
 
     /**

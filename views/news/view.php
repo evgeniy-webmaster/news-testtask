@@ -1,9 +1,16 @@
 <?php
 /* @var $this yii\web\View */
-?>
-<h1>news/view</h1>
 
-<p>
-    You may change the content of this page by modifying
-    the file <code><?= __FILE__; ?></code>.
-</p>
+use yii\helpers\Html;
+
+?>
+
+<article class="news">
+    <h1><?= $model->title ?></h1>
+    <?php if($model->imageSrc): ?>
+        <?= Html::img($model->imageSrc, [
+            'alt' => 'Image is not attached to this news.',
+        ]) ?>
+    <?php endif; ?>
+    <?= \Yii::$app->formatter->asParagraphs($model->text) ?>
+</article>
