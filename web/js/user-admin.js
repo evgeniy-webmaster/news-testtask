@@ -5,7 +5,7 @@ jQuery(function ($) {
             $('#userForm .modal-body').html(res)
             $('#userForm .modal-body').on('submit', 'form', function (event) {
                 event.preventDefault()
-                $.pjax.submit(event, '#userForm .modal-body')
+                $.pjax.submit(event, '#userForm .modal-body', { 'push': false })
             })
         })
     })
@@ -16,7 +16,7 @@ jQuery(function ($) {
             $('#userForm .modal-body').html(res)
             $('#userForm .modal-body').on('submit', 'form', function (event) {
                 event.preventDefault()
-                $.pjax.submit(event, '#userForm .modal-body')
+                $.pjax.submit(event, '#userForm .modal-body', { 'push': false })
             })
         })
     })
