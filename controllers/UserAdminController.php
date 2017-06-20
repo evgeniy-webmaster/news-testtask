@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use dektrium\user\controllers\AdminController as BaseAdminController;
 use dektrium\user\models\UserSearch;
-use dektrium\user\models\User;
+use app\models\User;
 use app\assets\PjaxAsset;
 
 class UserAdminController extends BaseAdminController
@@ -65,6 +65,15 @@ class UserAdminController extends BaseAdminController
         return $this->renderPartial('_account', [
             'user' => $user,
         ]);
+    }
+
+    public function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
 
 }

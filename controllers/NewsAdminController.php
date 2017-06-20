@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use yii\web\ForbiddenHttpException;
 
 /**
  * NewsController implements the CRUD actions for News model.
@@ -25,6 +26,25 @@ class NewsAdminController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'create'],
+                        'roles' => ['manager'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['update', 'status-change', 'delete'],
+                        'roles' => ['manager'],
+                    ],
                 ],
             ],
         ];
@@ -72,6 +92,13 @@ class NewsAdminController extends Controller
         ]);
     }
 
+    protected function canChange($model)
+    {
+        if(Yii::$app->user->identity->role == 'manager' &&
+           !Yii::$app->user->can('editOwnNews', ['news' => $model]))
+            throw new ForbiddenHttpException('You may edit only own news.');
+    }
+
     /**
      * Updates an existing News model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -81,6 +108,8 @@ class NewsAdminController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        $this->canChange($model);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
@@ -95,8 +124,8 @@ class NewsAdminController extends Controller
     {
         $post = Yii::$app->request->post();
         $model = $this->findModel($post['id']);
+        $this->canChange($model);
         $model->status = (bool)$post['value'];
-        //var_dump($model->status);
         $model->save();
     }
 
@@ -108,7 +137,9 @@ class NewsAdminController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $this->canChange($model);
+        $model->delete();
 
         return $this->redirect(['index']);
     }

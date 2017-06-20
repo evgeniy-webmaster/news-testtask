@@ -17,13 +17,11 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            //'identityClass' => 'app\models\User',
-            'identityClass' => 'dektrium\user\models\User',
+            'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
         ],
         'authManager' => [
-           'class' => 'yii\rbac\PhpManager',
-           //'defaultRoles' => ['admin'],
+           'class' => 'yii\rbac\DbManager',
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -65,7 +63,7 @@ $config = [
     'modules' => [
         'user' => [
             'class' => 'dektrium\user\Module',
-            'admins' => ['root'],
+            'adminPermission' => 'admin',
             'controllerMap' => [
                 'admin' => 'app\controllers\UserAdminController',
             ],

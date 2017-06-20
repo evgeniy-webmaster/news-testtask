@@ -37,11 +37,13 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'Home', 'url' => ['/']],
+            ['label' => 'News', 'url' => ['/news-admin'], 'visible' =>
+                Yii::$app->user->can('manager') || Yii::$app->user->can('admin')],
+            ['label' => 'Users', 'url' => ['user/admin'], 'visible' =>
+                Yii::$app->user->identity !== null && Yii::$app->user->identity->isAdmin],
             Yii::$app->user->isGuest ?
-            ['label' => 'Sign in', 'url' => ['/user/security/login']] :
+                ['label' => 'Sign in', 'url' => ['/user/security/login']] :
                 ['label' => 'Sign out (' . Yii::$app->user->identity->username . ')',
                     'url' => ['/user/security/logout'],
                     'linkOptions' => ['data-method' => 'post']],

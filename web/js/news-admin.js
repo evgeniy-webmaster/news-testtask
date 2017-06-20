@@ -5,7 +5,7 @@ jQuery(function ($) {
             $('#newsForm .modal-body').html(res)
             $('#newsForm .modal-body').on('submit', 'form', function (e) {
                 e.preventDefault()
-                $.pjax.submit(e, '#newsForm .modal-body')
+                $.pjax.submit(e, '#newsForm .modal-body', { 'push': false })
             })
         })
     })
@@ -16,15 +16,26 @@ jQuery(function ($) {
             $('#newsForm .modal-body').html(res)
             $('#newsForm .modal-body').on('submit', 'form', function (e) {
                 e.preventDefault()
-                $.pjax.submit(e, '#newsForm .modal-body')
+                $.pjax.submit(e, '#newsForm .modal-body', { 'push': false })
             })
             $('#newsForm').modal()
         })
     })
-    $('.statusAjaxControl').click(function () {
+    var lastClicked = null
+    $(document).on('click', '.statusAjaxControl', function () {
+        lastClicked = $(this)
         $.post('/news-admin/status-change', {
             'id': $(this).attr('data-modelId'),
-            'value': $(this).is(':checked') ? 1 : 0
+            'value': $(this).is(':checked') ? 1 : 0,
         })
+    })
+    $(document).ajaxError(function (event, request, settings) {
+        if(request.status == 403) {
+            $('#newsForm .modal-title').text('Error')
+            $('#newsForm .modal-body').html('<div class="alert alert-danger">' + request.responseText + '</div>')
+            $('#newsForm').modal('show')
+            if(settings.url == '/news-admin/status-change')
+                $(lastClicked).prop('checked', !$(lastClicked).prop('checked'))
+        }
     })
 })
