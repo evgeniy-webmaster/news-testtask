@@ -20,10 +20,10 @@ use yii\helpers\Html;
 
 <?php $form = ActiveForm::begin([]); ?>
 
-    <?= $form->field($user, 'email')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($user, 'username')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($user, 'password')->passwordInput() ?>
-    <?= $form->field($user, 'role')->radioList($user->roles()) ?>
+<?= $form->field($user, 'email')->textInput(['maxlength' => 255]) ?>
+<?= $form->field($user, 'username')->textInput(['maxlength' => 255]) ?>
+<?= $form->field($user, 'password')->passwordInput() ?>
+<?= $form->field($user, 'role')->radioList($user->roles()) ?>
 
 <div class="form-group">
     <?= Html::submitButton('Update', ['class' => 'btn btn-block btn-success']) ?>

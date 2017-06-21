@@ -20,6 +20,8 @@ use yii\widgets\Pjax;
     'data-target' => '#userForm',
 ]) ?></p>
 
+<?= $this->render('_search', ['model' => $searchModel]) ?>
+
 <!-- Modal -->
 <div class="modal fade" id="userForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">

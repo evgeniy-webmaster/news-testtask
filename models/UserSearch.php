@@ -53,11 +53,18 @@ class UserSearch extends User
             return $dataProvider;
         }
 
+        $mincat = $this->minCreatedAt ? strtotime($this->minCreatedAt) : null;
+        $maxcat = $this->maxCreatedAt ? strtotime($this->maxCreatedAt) : null;
+        $minllat = $this->minLastLoginAt ? strtotime($this->minLastLoginAt) : null;
+        $maxllat = $this->maxLastLoginAt ? strtotime($this->maxLastLoginAt) : null;
+
         $q->andFilterWhere(['id' => $this->id])
             ->andFilterWhere(['like', 'username', $this->username])
             ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['between', 'created_at', $this->minCreatedAt, $this->minCreatedAt])
-            ->andFilterWhere(['between', 'last_login_at', $this->minLastLoginAt, $this->maxLastLoginAt]);
+            ->andFilterWhere(['>', 'created_at', $mincat])
+            ->andFilterWhere(['<', 'created_at', $maxcat])
+            ->andFilterWhere(['>', 'last_login_at', $minllat])
+            ->andFilterWhere(['<', 'last_login_at', $maxllat]);
 
         return $dataProvider;
     }
