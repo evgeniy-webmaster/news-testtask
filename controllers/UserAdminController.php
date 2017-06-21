@@ -2,12 +2,12 @@
 
 namespace app\controllers;
 
-use dektrium\user\controllers\AdminController as BaseAdminController;
-use dektrium\user\models\UserSearch;
+use yii\web\Controller;
+use app\models\UserSearch;
 use app\models\User;
 use app\assets\PjaxAsset;
 
-class UserAdminController extends BaseAdminController
+class UserAdminController extends Controller
 {
     public function actionIndex()
     {
@@ -35,12 +35,9 @@ class UserAdminController extends BaseAdminController
             'class'    => User::className(),
             'scenario' => 'create',
         ]);
-        $event = $this->getUserEvent($user);
 
-        $this->trigger(self::EVENT_BEFORE_CREATE, $event);
-        if ($user->load(\Yii::$app->request->post()) && $user->create()) {
-            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'User has been created'));
-            $this->trigger(self::EVENT_AFTER_CREATE, $event);
+        if ($user->load(\Yii::$app->request->post()) && $user->save()) {
+            \Yii::$app->getSession()->setFlash('success', 'User has been created');
             return $this->redirect(['index']);
         }
 
@@ -53,16 +50,13 @@ class UserAdminController extends BaseAdminController
     {
         $user = $this->findModel($id);
         $user->scenario = 'update';
-        $event = $this->getUserEvent($user);
 
-        $this->trigger(self::EVENT_BEFORE_UPDATE, $event);
         if ($user->load(\Yii::$app->request->post()) && $user->save()) {
             \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'Account details have been updated'));
-            $this->trigger(self::EVENT_AFTER_UPDATE, $event);
             return $this->redirect('/user/admin');
         }
 
-        return $this->renderPartial('_account', [
+        return $this->renderPartial('update', [
             'user' => $user,
         ]);
     }

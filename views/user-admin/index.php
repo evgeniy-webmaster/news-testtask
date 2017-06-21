@@ -39,7 +39,7 @@ use yii\widgets\Pjax;
 
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
-    'filterModel'  => $searchModel,
+    //'filterModel'  => $searchModel,
     'layout'       => "{items}\n{pager}",
     'columns' => [
         'id',
@@ -56,6 +56,9 @@ use yii\widgets\Pjax;
             },
         ],
         'email:email',
+        'created_at:datetime',
+        'last_login_at:datetime',
+        /*
         [
             'attribute' => 'created_at',
             'value' => function ($model) {
@@ -78,6 +81,7 @@ use yii\widgets\Pjax;
             }
           },
         ],
+        */
     ],
 ]); ?>
 

@@ -60,6 +60,7 @@ $config = [
             'datetimeFormat' => 'yyyy-MM-dd H:mm',
         ],
     ],
+    /*
     'modules' => [
         'user' => [
             'class' => 'dektrium\user\Module',
@@ -69,6 +70,7 @@ $config = [
             ],
         ],
     ],
+    */
     'params' => $params,
 ];
 

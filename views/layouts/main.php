@@ -40,15 +40,16 @@ AppAsset::register($this);
             ['label' => 'Home', 'url' => ['/']],
             ['label' => 'News', 'url' => ['/news-admin'], 'visible' =>
                 Yii::$app->user->can('manager') || Yii::$app->user->can('admin')],
-            ['label' => 'Users', 'url' => ['user/admin'], 'visible' =>
-                Yii::$app->user->identity !== null && Yii::$app->user->identity->isAdmin],
+            ['label' => 'Users', 'url' => ['/user-admin'], 'visible' =>
+                Yii::$app->user->identity !== null && Yii::$app->user->can('admin')],
+            /*
             Yii::$app->user->isGuest ?
                 ['label' => 'Sign in', 'url' => ['/user/security/login']] :
                 ['label' => 'Sign out (' . Yii::$app->user->identity->username . ')',
                     'url' => ['/user/security/logout'],
                     'linkOptions' => ['data-method' => 'post']],
             ['label' => 'Register', 'url' => ['/user/registration/register'], 'visible' => Yii::$app->user->isGuest]
-            /*
+            */
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
@@ -60,8 +61,8 @@ AppAsset::register($this);
                 )
                 . Html::endForm()
                 . '</li>'
-            )
-            */
+            ),
+            ['label' => 'Register', 'url' => ['site/register'], 'visible' => Yii::$app->user->isGuest],
         ],
     ]);
     NavBar::end();

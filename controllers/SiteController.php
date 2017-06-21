@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\User;
 
 class SiteController extends Controller
 {
@@ -51,6 +52,9 @@ class SiteController extends Controller
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
+            'page' => [
+                'class' => 'yii\web\ViewAction',
+            ],
         ];
     }
 
@@ -62,6 +66,27 @@ class SiteController extends Controller
     public function actionIndex()
     {
         return $this->render('index');
+    }
+
+    public function actionRegister()
+    {
+        $model = new User();
+        $model->scenario = User::SCENARIO_REGISTER;
+
+        if($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->redirect(['page', 'view' => 'confirm-email']);
+        }
+
+        return $this->render('register', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionConfirm($key)
+    {
+        if(User::confirm($key))
+            $this->redirect(['page', 'view' => 'account-confirmed']);
+        else $this->redirect(['register']);
     }
 
     /**

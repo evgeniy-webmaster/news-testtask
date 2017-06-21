@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Dektrium project
+ * This file is part of the Dektrium project.
  *
  * (c) Dektrium project <http://github.com/dektrium>
  *
@@ -16,6 +16,7 @@ use yii\helpers\Html;
  * @var yii\web\View $this
  * @var dektrium\user\models\User $user
  */
+
 ?>
 
 <?php $form = ActiveForm::begin([
@@ -33,11 +34,7 @@ use yii\helpers\Html;
 
 <div class="form-group">
     <div class="col-lg-offset-3 col-lg-9">
-        <?= Html::submitButton(Yii::t('user', 'Update'), ['class' => 'btn btn-block btn-success']) ?>
-        <?= Html::a('Delete', ['/user/admin/delete', 'id' => $user->id], [
-            'class' => 'btn btn-block btn-danger',
-            'data-method' => 'POST',
-        ]) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-block btn-success']) ?>
     </div>
 </div>
 

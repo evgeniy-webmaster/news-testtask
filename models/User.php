@@ -2,11 +2,45 @@
 
 namespace app\models;
 
-use dektrium\user\models\User as BaseUser;
+use Yii;
 
-class User extends BaseUser
+/**
+ * This is the model class for table "user".
+ *
+ * @property integer $id
+ * @property string $username
+ * @property string $email
+ * @property string $password_hash
+ * @property integer $created_at
+ * @property integer $confirmed
+ * @property integer $last_login_at
+ *
+ * @property News[] $news
+ */
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
+    const SCENARIO_LOGIN = 'login';
+    const SCENARIO_REGISTER = 'register';
+
     protected $_role;
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[self::SCENARIO_CONFIRM] = ['password'];
+        return $scenarios;
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => \yii\behaviors\TimestampBehavior::className(),
+                'updatedAtAttribute' => false,
+            ],
+        ];
+    }
 
     public function roles()
     {
@@ -17,12 +51,72 @@ class User extends BaseUser
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'user';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
-        $rules = parent::rules();
-        $rules[] = [['role'], 'safe'];
-        $rules[] = [['role'], 'default', 'value' => 'user'];
-        return $rules;
+        return [
+            [['username', 'email', 'created_at', 'confirmed'], 'required'],
+            [['username', 'email'], 'string', 'max' => 255],
+            [['username'], 'unique'],
+            [['created_at', 'last_login_at'], 'integer'],
+            [['email'], 'email'],
+            [['email'], 'unique'],
+            [['password_hash'], 'string', 'max' => 60],
+            [['confirmed'], 'boolean'],
+            [['confirmed'], 'default', 'value' => false, 'on' => self::SCENARIO_REGISTER],
+            [['role'], 'safe'],
+            [['role'], 'default', 'value' => 'user', 'on' => self::SCENARIO_REGISTER],
+        ];
+    }
+
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return null;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+        return null;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        return false;
+    }
+
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword($password, $this-> password_hash);
+    }
+
+    public function getPassword()
+    {
+        return null;
+    }
+
+    public function setPassword($password)
+    {
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
 
     public function getRole()
@@ -46,8 +140,33 @@ class User extends BaseUser
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'username' => 'Username',
+            'email' => 'Email',
+            'password_hash' => 'Password Hash',
+            'created_at' => 'Created At',
+            'confirmed' => 'Confirmed',
+            'last_login_at' => 'Last Login At',
+        ];
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
+        if($insert && $this->scenario == self::SCENARIO_REGISTER) {
+            $key = Yii::$app->security->encryptByKey($this->id, Yii::$app->params['confirmAccountKey']);
+
+            Yii::$app->mailer->compose('user/confirm-account', ['key' => $key])
+                ->setFrom('noreply@' . Yii::$app->request->serverName)
+                ->setTo($this->email)
+                ->setSubject('Confirm registration on ' . Yii::$app->request->serverName)
+                ->send();
+        }
         if($this->_role) {
             $auth = \Yii::$app->authManager;
             $role = $auth->getRole($this->_role);
@@ -57,4 +176,24 @@ class User extends BaseUser
         parent::afterSave($insert, $changedAttributes);
     }
 
+    public static function confirm($key)
+    {
+        $id = Yii::$app->security->decryptByKey($key, Yii::$app->params['confirmAccountKey']);
+
+        if($id === false) return false;
+
+        $model = self::findOne($id);
+        $model->confirmed = true;
+        $model->save();
+
+        return true;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNews()
+    {
+        return $this->hasMany(News::className(), ['authorId' => 'id']);
+    }
 }
