@@ -18,27 +18,19 @@ use yii\helpers\Html;
  */
 ?>
 
-<?php $form = ActiveForm::begin([
-    'layout' => 'horizontal',
-    'enableAjaxValidation' => true,
-    'enableClientValidation' => false,
-    'fieldConfig' => [
-        'horizontalCssClasses' => [
-            'wrapper' => 'col-sm-9',
-        ],
-    ],
-]); ?>
+<?php $form = ActiveForm::begin([]); ?>
 
-<?= $this->render('_user', ['form' => $form, 'user' => $user]) ?>
+    <?= $form->field($user, 'email')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($user, 'username')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($user, 'password')->passwordInput() ?>
+    <?= $form->field($user, 'role')->radioList($user->roles()) ?>
 
 <div class="form-group">
-    <div class="col-lg-offset-3 col-lg-9">
-        <?= Html::submitButton('Update', ['class' => 'btn btn-block btn-success']) ?>
-        <?= Html::a('Delete', ['/user/admin/delete', 'id' => $user->id], [
-            'class' => 'btn btn-block btn-danger',
-            'data-method' => 'POST',
-        ]) ?>
-    </div>
+    <?= Html::submitButton('Update', ['class' => 'btn btn-block btn-success']) ?>
+    <?= Html::a('Delete', ['/user-admin/delete', 'id' => $user->id], [
+        'class' => 'btn btn-block btn-danger',
+        'data-method' => 'POST',
+    ]) ?>
 </div>
 
 <?php ActiveForm::end(); ?>

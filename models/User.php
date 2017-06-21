@@ -21,12 +21,16 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     const SCENARIO_LOGIN = 'login';
     const SCENARIO_REGISTER = 'register';
+    const SCENARIO_CONFIRM = 'confirm';
+    const SCENARIO_CREATE = 'create';
 
     protected $_role;
+    public $password;
 
     public function scenarios()
     {
         $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_CREATE] = ['username', 'email'];
         $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         $scenarios[self::SCENARIO_CONFIRM] = ['password'];
         return $scenarios;
@@ -65,15 +69,16 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'email', 'created_at', 'confirmed'], 'required'],
+            [['username', 'email'], 'required'],
             [['username', 'email'], 'string', 'max' => 255],
             [['username'], 'unique'],
             [['created_at', 'last_login_at'], 'integer'],
             [['email'], 'email'],
             [['email'], 'unique'],
             [['password_hash'], 'string', 'max' => 60],
+            [['password'], 'string'],
             [['confirmed'], 'boolean'],
-            [['confirmed'], 'default', 'value' => false, 'on' => self::SCENARIO_REGISTER],
+            [['confirmed'], 'default', 'value' => false, 'on' => [self::SCENARIO_REGISTER, self::SCENARIO_CREATE]],
             [['role'], 'safe'],
             [['role'], 'default', 'value' => 'user', 'on' => self::SCENARIO_REGISTER],
         ];
@@ -106,17 +111,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this-> password_hash);
-    }
-
-    public function getPassword()
-    {
-        return null;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
     public function getRole()
@@ -156,12 +151,31 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         ];
     }
 
+    public function beforeSave($insert)
+    {
+        if(!parent::beforeSave($insert)) return false;
+
+        if($this->password)
+            $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
+
+        if($this->password && self::SCENARIO_DEFAULT) {
+            Yii::$app->mailer->compose('user/password-changed', ['username' => $this->username])
+                ->setFrom('noreply@' . Yii::$app->request->serverName)
+                ->setTo($this->email)
+                ->setSubject('Your password has been changed on ' . Yii::$app->request->serverName)
+                ->send();
+        }
+
+        return true;
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
-        if($insert && $this->scenario == self::SCENARIO_REGISTER) {
+        if($insert && ( $this->scenario == self::SCENARIO_REGISTER ||
+                        $this->scenario == self::SCENARIO_CREATE )) {
             $key = Yii::$app->security->encryptByKey($this->id, Yii::$app->params['confirmAccountKey']);
 
-            Yii::$app->mailer->compose('user/confirm-account', ['key' => $key])
+            Yii::$app->mailer->compose('user/confirm-account', ['key' => $key, 'username' => $this->username])
                 ->setFrom('noreply@' . Yii::$app->request->serverName)
                 ->setTo($this->email)
                 ->setSubject('Confirm registration on ' . Yii::$app->request->serverName)

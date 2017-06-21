@@ -84,9 +84,23 @@ class SiteController extends Controller
 
     public function actionConfirm($key)
     {
-        if(User::confirm($key))
-            $this->redirect(['page', 'view' => 'account-confirmed']);
-        else $this->redirect(['register']);
+        $id = Yii::$app->security->decryptByKey($key, Yii::$app->params['confirmAccountKey']);
+
+        if($id === false) $this->redirect(['register']);
+
+        $model = User::findOne(['id' => $id, 'confirmed' => false]);
+        $model->scenario = User::SCENARIO_CONFIRM;
+
+        if($model->load(Yii::$app->request->post()) && $model->save()) {
+            \Yii::$app->getSession()->setFlash('success', 'Password is saved, use it to login.');
+            return $this->redirect(['login']);
+        }
+
+        if($model->password_hash !== '') {
+            $model->confirmed = true;
+            $model->save();
+            return $this->redirect(['page', 'view' => 'account-confirmed']);
+        } else return $this->render('confirm', ['model' => $model]);
     }
 
     /**
@@ -105,6 +119,7 @@ class SiteController extends Controller
             return $this->goBack();
         }
         return $this->render('login', [
+            'success' => \Yii::$app->getSession()->getFlash('success'),
             'model' => $model,
         ]);
     }

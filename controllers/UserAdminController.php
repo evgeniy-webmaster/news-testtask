@@ -6,9 +6,34 @@ use yii\web\Controller;
 use app\models\UserSearch;
 use app\models\User;
 use app\assets\PjaxAsset;
+use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+
 
 class UserAdminController extends Controller
 {
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
         $searchModel  = \Yii::createObject(UserSearch::className());
@@ -31,10 +56,7 @@ class UserAdminController extends Controller
     public function actionCreate()
     {
         /** @var User $user */
-        $user = \Yii::createObject([
-            'class'    => User::className(),
-            'scenario' => 'create',
-        ]);
+        $user = new User(['scenario' => User::SCENARIO_CREATE]);
 
         if ($user->load(\Yii::$app->request->post()) && $user->save()) {
             \Yii::$app->getSession()->setFlash('success', 'User has been created');
@@ -49,16 +71,23 @@ class UserAdminController extends Controller
     public function actionUpdate($id)
     {
         $user = $this->findModel($id);
-        $user->scenario = 'update';
 
         if ($user->load(\Yii::$app->request->post()) && $user->save()) {
-            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'Account details have been updated'));
-            return $this->redirect('/user/admin');
+            \Yii::$app->getSession()->setFlash('success', 'Account details have been updated');
+            return $this->redirect(['index']);
         }
 
         return $this->renderPartial('update', [
             'user' => $user,
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        if(User::findOne($id)->delete()) {
+            \Yii::$app->getSession()->setFlash('success', 'Account details have been deleted');
+            return $this->redirect(['index']);
+        }
     }
 
     public function findModel($id)

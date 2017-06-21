@@ -13,6 +13,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <?php if($success): ?>
+        <div class="alert alert-success"><?= $success ?></div>
+    <?php endif; ?>
+
     <p>Please fill out the following fields to login:</p>
 
     <?php $form = ActiveForm::begin([
