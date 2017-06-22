@@ -1,11 +1,15 @@
 ## Простейший новостной сайт с авторизацией и оповещением пользователей о событиях.
 
+Деплой примерно стандартный, клонируем репозиторий, настраиваем базу, прогоняем миграции затем фикстуры.
+Если возникнут проблемы с миграциими или фикстурами готовый дамп можно взять [тут](https://drive.google.com/open?id=0B4UDN89TCgJWb1pFMmZXTnBFVUE).
+
 Использовал миграции и фикстуры, тесты не использовались.
 
-Роль        Пользователь      Пароль
-admin       root              root
-manager     manager           manager
-user        user              user
+Роль|Пользователь|Пароль|
+---|---|---
+admin|root|root
+manager|manager|manager
+user|user|user
 
 ## Разработка архитектуры модуля уведомлений (на основе системы событий Yii2).
 
@@ -13,21 +17,23 @@ user        user              user
 
 Необходима одна таблица:
 
-`CREATE TABLE `NotifyTemplate` (
+```sql
+CREATE TABLE `NotifyTemplate` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `modelName` char(255) NOT NULL,
   `eventName` char(255) NOT NULL,
   `notificatorName` char(255) NOT NULL,
   `template` text NOT NULL,
   PRIMARY KEY (`id`)
-)`
+)
+```
 
 ### Мета код
 
-Тут мета код и его UML диаграмма https://docs.google.com/drawings/d/1VIc9Ymox7HQgyV-BU2ESGCwROQv7Ei2RuaxFjhxn6xo/edit?usp=sharing 
+Тут мета код и его UML [диаграмма](https://docs.google.com/drawings/d/1VIc9Ymox7HQgyV-BU2ESGCwROQv7Ei2RuaxFjhxn6xo/edit?usp=sharing), если она может быть полезна:-)
 
 
-`
+```php
 interface NotificatorInterface
 {
     public function notify(string $message, User $user);
@@ -66,8 +72,7 @@ class NotifyTemplate extends \yii\db\ActiveRecord {
 }
 
 class NotifyTemplateController extends \yii\web\Controller {}
-
-`
+```
 
 ### Описание работы
 
