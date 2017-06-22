@@ -74,7 +74,7 @@ class UserAdminController extends Controller
 
         if ($user->load(\Yii::$app->request->post()) && $user->save()) {
             \Yii::$app->getSession()->setFlash('success', 'Account details have been updated');
-            return $this->redirect(['index']);
+            return $this->redirect(\Yii::$app->request->referrer);
         }
 
         return $this->renderPartial('update', [
@@ -86,7 +86,7 @@ class UserAdminController extends Controller
     {
         if(User::findOne($id)->delete()) {
             \Yii::$app->getSession()->setFlash('success', 'Account details have been deleted');
-            return $this->redirect(['index']);
+            return $this->redirect(\Yii::$app->request->referrer);
         }
     }
 

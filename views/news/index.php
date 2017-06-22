@@ -4,9 +4,12 @@
 use yii\helpers\Html;
 use yii\widgets\LinkPager;
 use yii\widgets\Menu;
+use app\widgets\Notifications;
 
 ?>
 <h1>News</h1>
+
+<?= Notifications::widget() ?>
 
 <div>
     Max news on the page: <?= Menu::widget([

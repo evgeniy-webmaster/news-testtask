@@ -112,7 +112,7 @@ class NewsAdminController extends Controller
         $this->canChange($model);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(\Yii::$app->request->referrer);
         } else {
             return $this->renderPartial('update', [
                 'model' => $model,
@@ -141,7 +141,7 @@ class NewsAdminController extends Controller
         $this->canChange($model);
         $model->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(\Yii::$app->request->referrer);
     }
 
     /**

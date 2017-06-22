@@ -80,6 +80,14 @@ class News extends \yii\db\ActiveRecord
                     ->setSubject(Yii::$app->request->serverName . ': ' . $this->title)
                     ->send();
             }
+            $users = User::find()->where(['confirmed' => true, 'get_browser_notify' => true])->all();
+            foreach($users as $u) {
+                $notify = new \app\models\Notify();
+                $notify->userId = $u->id;
+                $link = \yii\helpers\Html::a($this->title, ['/news/view', 'id' => $this->id]);
+                $notify->message = 'We add the news "' . $link . '".';
+                $notify->save();
+            }
         }
         parent::afterSave($insert, $changedAttributes);
     }

@@ -127,3 +127,7 @@ a.desc:after {
 #limitMenu li.active a {
     color: #333;
 }
+
+.removeNotify {
+    float: right;
+}
