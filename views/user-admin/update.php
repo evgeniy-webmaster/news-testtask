@@ -24,6 +24,8 @@ use yii\helpers\Html;
 <?= $form->field($user, 'username')->textInput(['maxlength' => 255]) ?>
 <?= $form->field($user, 'password')->passwordInput() ?>
 <?= $form->field($user, 'role')->radioList($user->roles()) ?>
+<?= $form->field($user, 'get_emails')->checkbox() ?>
+<?= $form->field($user, 'get_browser_notify')->checkbox() ?>
 
 <div class="form-group">
     <?= Html::submitButton('Update', ['class' => 'btn btn-block btn-success']) ?>

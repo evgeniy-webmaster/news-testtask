@@ -29,6 +29,6 @@ return [
         'confirmed' => 1,
         'last_login_at' => 0,
         'get_emails' => true,
-        'get_browser_notify' => false,
+        'get_browser_notify' => true,
     ],
 ];

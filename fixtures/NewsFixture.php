@@ -7,6 +7,10 @@ class NewsFixture extends ActiveFixture
 {
     public $modelClass = 'app\models\News';
 
+    public $depends = [
+        'app\fixtures\UserFixture',
+    ];
+
     protected function getData()
     {
         $faker = \Faker\Factory::create();

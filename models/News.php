@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use app\models\User;
 
 /**
  * This is the model class for table "news".
@@ -69,6 +70,17 @@ class News extends \yii\db\ActiveRecord
     {
         if($this->image instanceof \yii\web\UploadedFile)
             $this->image->saveAs(Yii::getAlias('@app') . '/web/news-images/' . $this->id . '.jpg');
+
+        if($insert && $this->status) {
+            $users = User::find()->where(['confirmed' => true, 'get_emails' => true])->all();
+            foreach($users as $u) {
+                Yii::$app->mailer->compose('news/news-created', ['news' => $this])
+                    ->setFrom('noreply@' . Yii::$app->request->serverName)
+                    ->setTo($u->email)
+                    ->setSubject(Yii::$app->request->serverName . ': ' . $this->title)
+                    ->send();
+            }
+        }
         parent::afterSave($insert, $changedAttributes);
     }
 

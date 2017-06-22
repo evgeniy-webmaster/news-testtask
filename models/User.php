@@ -81,6 +81,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['confirmed'], 'default', 'value' => false, 'on' => [self::SCENARIO_REGISTER, self::SCENARIO_CREATE]],
             [['role'], 'safe'],
             [['role'], 'default', 'value' => 'user', 'on' => self::SCENARIO_REGISTER],
+            [['get_emails', 'get_browser_notify'], 'boolean'],
+            [['get_emails'], 'default', 'value' => true, 'on' => self::SCENARIO_REGISTER],
+            [['get_browser_notify'], 'default', 'value' => true, 'on' => self::SCENARIO_REGISTER],
         ];
     }
 
