@@ -9,19 +9,17 @@ class NewsFixture extends ActiveFixture
 
     protected function getData()
     {
-        //echo __DIR__; die();
         $faker = \Faker\Factory::create();
 
         $out = [];
         for($i = 0; $i < 50; $i++) {
             $img = $faker->image('/tmp', 640, 480, 'cats');
             rename($img, \Yii::getAlias('@app/web/news-images/') . $i . '.jpg');
-            //unlink($img);
 
             $out[$i]['authorId'] = rand(1, 2);
             $out[$i]['title'] = $faker->sentence();
             $out[$i]['shortText'] = $faker->paragraph();
-            $out[$i]['text'] = $faker->text();
+            $out[$i]['text'] = $faker->paragraphs(10, true);
             $out[$i]['status'] = rand(0, 1);
             $out[$i]['updated_at'] = $faker->unixTime();
             $out[$i]['created_at'] = $faker->unixTime($out[$i]['updated_at']);
